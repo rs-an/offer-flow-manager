@@ -85,21 +85,32 @@ def fetch(cid: int):
 @app.post("/api/campaigns")
 def create(data: CampaignInput):
     call("GET", f"offers/{data.offer_id}")
-    campaign = call("POST", "campaigns", json=dict(name=data.name, alias=uuid4().hex,
-        domain_id=data.domain_id, group_id=str(data.group_id), traffic_source_id=data.traffic_source_id,
-        type="position", state="disabled"))
+    alias = uuid4().hex
+    try:
+        campaign = call("POST", "campaigns", json=dict(name=data.name, alias=alias,
+            domain_id=data.domain_id, group_id=str(data.group_id), traffic_source_id=data.traffic_source_id,
+            type="position", state="disabled"))
+    except HTTPException as exc:
+        raise HTTPException(exc.status_code,
+            f"Создание не подтверждено. Перед повтором проверьте в Keitaro кампанию "
+            f"«{data.name}» с alias {alias}. {exc.detail}") from exc
+
     cid = campaign["id"]
+    progress = "создана. Проверьте в Keitaro поток страны."
     try:
         call("POST", "streams", json=dict(campaign_id=cid, name=data.country, position=1,
             type="regular", state="active", schema="redirect", action_type="http",
             action_payload="https://www.google.com/", filters=[dict(name="country", mode="accept", payload=[data.country])]))
+        progress = "создана, поток страны готов. Проверьте в Keitaro поток с оффером."
         call("POST", "streams", json=dict(campaign_id=cid, name="Офферы", position=2,
             type="default", state="active", action_type="http", schema="landings", offers=[
                 dict(offer_id=data.offer_id, share=100, state="active")]))
+        progress = "создана с обоими потоками. Проверьте в Keitaro, включена ли кампания."
         call("POST", f"campaigns/{cid}/enable")
+        progress = "включена. Откройте «Кампании», введите её ID и нажмите «Загрузить потоки»."
         return fetch(cid)
     except HTTPException as exc:
-        raise HTTPException(exc.status_code, f"Кампания #{cid} создана. Проверьте состояние: {exc.detail}") from exc
+        raise HTTPException(exc.status_code, f"Кампания #{cid} {progress} {exc.detail}") from exc
 
 @app.post("/api/streams/{sid}/offers/{action}")
 def edit(sid: int, action: str, data: Change):
