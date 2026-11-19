@@ -1,0 +1,13 @@
+.env
+.env.save
+.env.*
+!.env.example
+.venv/
+*.db
+__pycache__/
+node_modules/
+dist/
+.pytest_cache/
+.DS_Store
+*.db-*
+materials/
