@@ -117,7 +117,11 @@ function App(){
   }, [dark]);
   const [collapsed, setCollapsed] = useState(false);
   return <div className={'shell' + (collapsed ? ' compact' : '')}>
-    <header><button className="menu" aria-label="Свернуть или развернуть меню" aria-expanded={!collapsed} onClick={()=>setCollapsed(!collapsed)}>☰</button><img className="app-icon" src="/adrobot.svg" alt=""/><strong>Adrobot</strong>
+    <header><button className="menu" aria-label="Свернуть или развернуть меню" aria-expanded={!collapsed} onClick={()=>setCollapsed(!collapsed)}>
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M2 3h12 M2 8h12 M2 13h12" fill="none" stroke="currentColor" strokeWidth="2"/>
+      </svg>
+    </button><img className="app-icon" src="/adrobot.svg" alt=""/><strong>Adrobot</strong>
       <button className="theme-switch" type="button" role="switch" aria-label="Тёмная тема"
         aria-checked={dark} onClick={() => setDark(value => !value)}>
         <span>Тема</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
