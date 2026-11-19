@@ -6,6 +6,7 @@
 *.db
 __pycache__/
 node_modules/
+frontend/.vite/
 dist/
 .pytest_cache/
 .DS_Store
